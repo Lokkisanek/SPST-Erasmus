@@ -1,0 +1,8 @@
+frontend webu -
+    Přidat i kolonku pro cizi země 
+
+
+
+Ukoly ohledně diagramů - 
+    udělat use case diagram (s dědičnostmi)
+    udělat sekvenční diagram 
