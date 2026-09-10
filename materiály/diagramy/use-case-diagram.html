@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Erasmus Systém — Use Case Diagram (revize)</title>
+  <style>
+    :root {
+      --bg: #f4f6f9;
+      --paper: #ffffff;
+      --ink: #1a2332;
+      --muted: #5c6b7a;
+      --line: #94a3b8;
+      --system: #2563eb;
+      --system-fill: #eff6ff;
+      --zone-public: #ecfdf5;
+      --zone-student: #fef3c7;
+      --zone-teacher: #fce7f3;
+      --zone-coord: #ede9fe;
+      --zone-auth: #f1f5f9;
+      --zone-system: #fff7ed;
+      --actor: #0f172a;
+      --include: #7c3aed;
+      --extend: #dc2626;
+      --external: #0891b2;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.45;
+    }
+
+    header {
+      background: var(--paper);
+      border-bottom: 1px solid #e2e8f0;
+      padding: 1.25rem 1.5rem 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    }
+
+    header h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.92rem;
+      max-width: 72rem;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem 1.5rem;
+      margin-top: 0.85rem;
+      font-size: 0.82rem;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .legend .swatch {
+      width: 28px;
+      height: 3px;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    .legend .swatch.assoc { background: var(--actor); }
+    .legend .swatch.inherit { background: var(--actor); border-top: 2px solid var(--actor); height: 0; width: 18px; }
+    .legend .swatch.include { background: var(--include); border-bottom: 2px dashed var(--include); }
+    .legend .swatch.extend { background: var(--extend); border-bottom: 2px dashed var(--extend); }
+
+    .toolbar {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .toolbar button {
+      border: 1px solid #cbd5e1;
+      background: #fff;
+      border-radius: 8px;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.82rem;
+      cursor: pointer;
+    }
+
+    .toolbar button:hover { background: #f8fafc; }
+
+    main {
+      padding: 1rem;
+      overflow: auto;
+      height: calc(100vh - 170px);
+    }
+
+    #canvas {
+      background:
+        linear-gradient(#e8edf3 1px, transparent 1px) 0 0 / 24px 24px,
+        linear-gradient(90deg, #e8edf3 1px, transparent 1px) 0 0 / 24px 24px,
+        var(--paper);
+      border: 1px solid #dbe3ec;
+      border-radius: 12px;
+      box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+      min-width: 1480px;
+      min-height: 1180px;
+      transform-origin: 0 0;
+    }
+
+    svg { display: block; }
+
+    .system-boundary {
+      fill: none;
+      stroke: var(--system);
+      stroke-width: 2.2;
+    }
+
+    .system-title {
+      fill: var(--system);
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .zone {
+      stroke-width: 1.4;
+      stroke-dasharray: 6 4;
+      rx: 10;
+    }
+
+    .zone-title {
+      font-size: 12px;
+      font-weight: 700;
+      fill: var(--ink);
+    }
+
+    .use-case {
+      fill: #fff;
+      stroke: var(--ink);
+      stroke-width: 1.3;
+    }
+
+    .use-case-text {
+      font-size: 11px;
+      fill: var(--ink);
+      text-anchor: middle;
+    }
+
+    .use-case-text.small { font-size: 10px; }
+
+    .actor-line { stroke: var(--actor); stroke-width: 1.4; fill: none; }
+    .inherit-line { stroke: var(--actor); stroke-width: 1.5; fill: none; }
+    .include-line { stroke: var(--include); stroke-width: 1.3; fill: none; stroke-dasharray: 5 4; marker-end: url(#arrow-include); }
+    .extend-line { stroke: var(--extend); stroke-width: 1.3; fill: none; stroke-dasharray: 5 4; marker-end: url(#arrow-extend); }
+    .external-line { stroke: var(--external); stroke-width: 1.3; fill: none; stroke-dasharray: 4 3; }
+
+    .stereotype {
+      font-size: 9px;
+      fill: var(--muted);
+      font-style: italic;
+    }
+
+    .actor-name {
+      font-size: 12px;
+      font-weight: 600;
+      fill: var(--actor);
+      text-anchor: middle;
+    }
+
+    .actor-name.external { fill: var(--external); }
+
+    .note-box {
+      fill: #fffbeb;
+      stroke: #f59e0b;
+      stroke-width: 1;
+      rx: 6;
+    }
+
+    .note-text {
+      font-size: 10px;
+      fill: #92400e;
+    }
+
+    footer {
+      padding: 0.75rem 1.5rem 1.25rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Erasmus Systém — revidovaný Use Case Diagram</h1>
+    <p>
+      Návrh dle matice oprávnění, kritérií výběru a UI mockupů.
+      Obsahuje dědičnosti aktérů, externí systémy, chybějící use cases a opravené názvy vztahů.
+    </p>
+    <div class="legend">
+      <span><i class="swatch assoc"></i> Asociace aktér → use case</span>
+      <span><i class="swatch inherit"></i> Dědičnost aktérů (△)</span>
+      <span><i class="swatch include"></i> &lt;&lt;include&gt;&gt;</span>
+      <span><i class="swatch extend"></i> &lt;&lt;extend&gt;&gt;</span>
+    </div>
+    <div class="toolbar">
+      <button type="button" id="zoom-in">+ Přiblížit</button>
+      <button type="button" id="zoom-out">− Oddálit</button>
+      <button type="button" id="zoom-reset">100 %</button>
+    </div>
+  </header>
+
+  <main id="viewport">
+    <div id="canvas">
+      <svg width="1480" height="1180" viewBox="0 0 1480 1180" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow-include" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 Z" fill="#7c3aed" />
+          </marker>
+          <marker id="arrow-extend" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+            <path d="M0,0 L8,4 L0,8 Z" fill="#dc2626" />
+          </marker>
+          <marker id="arrow-inherit" markerWidth="10" markerHeight="10" refX="5" refY="5" orient="auto">
+            <path d="M0,10 L5,0 L10,10 Z" fill="white" stroke="#0f172a" stroke-width="1.2" />
+          </marker>
+        </defs>
+
+        <!-- ===================== ACTORS LEFT ===================== -->
+        <!-- Návštěvník -->
+        <g transform="translate(55, 120)">
+          <circle cx="28" cy="12" r="10" fill="none" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="22" x2="28" y2="48" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="10" y1="32" x2="46" y2="32" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="48" x2="12" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="48" x2="44" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <text class="actor-name" x="28" y="86">Návštěvník</text>
+        </g>
+
+        <!-- Přihlášený uživatel -->
+        <g transform="translate(42, 250)">
+          <circle cx="40" cy="12" r="10" fill="none" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="40" y1="22" x2="40" y2="48" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="22" y1="32" x2="58" y2="32" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="40" y1="48" x2="24" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="40" y1="48" x2="56" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <text class="actor-name" x="40" y="86">Přihlášený</text>
+          <text class="actor-name" x="40" y="100">uživatel</text>
+        </g>
+
+        <!-- Žák -->
+        <g transform="translate(30, 390)">
+          <circle cx="28" cy="12" r="10" fill="none" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="22" x2="28" y2="48" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="10" y1="32" x2="46" y2="32" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="48" x2="12" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="48" x2="44" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <text class="actor-name" x="28" y="86">Žák</text>
+        </g>
+
+        <!-- Učitel -->
+        <g transform="translate(30, 530)">
+          <circle cx="28" cy="12" r="10" fill="none" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="22" x2="28" y2="48" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="10" y1="32" x2="46" y2="32" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="48" x2="12" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="48" x2="44" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <text class="actor-name" x="28" y="86">Učitel</text>
+        </g>
+
+        <!-- Třídní učitel -->
+        <g transform="translate(10, 660)">
+          <circle cx="28" cy="12" r="10" fill="none" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="22" x2="28" y2="48" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="10" y1="32" x2="46" y2="32" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="48" x2="12" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="48" x2="44" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <text class="actor-name" x="28" y="86">Třídní</text>
+          <text class="actor-name" x="28" y="100">učitel</text>
+        </g>
+
+        <!-- Učitel AJ -->
+        <g transform="translate(10, 790)">
+          <circle cx="28" cy="12" r="10" fill="none" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="22" x2="28" y2="48" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="10" y1="32" x2="46" y2="32" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="48" x2="12" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="48" x2="44" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <text class="actor-name" x="28" y="86">Učitel AJ</text>
+        </g>
+
+        <!-- Správce -->
+        <g transform="translate(30, 930)">
+          <circle cx="28" cy="12" r="10" fill="none" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="22" x2="28" y2="48" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="10" y1="32" x2="46" y2="32" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="48" x2="12" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="48" x2="44" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <text class="actor-name" x="28" y="86">Správce</text>
+        </g>
+
+        <!-- Koordinátor -->
+        <g transform="translate(10, 1060)">
+          <circle cx="28" cy="12" r="10" fill="none" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="22" x2="28" y2="48" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="10" y1="32" x2="46" y2="32" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="48" x2="12" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="48" x2="44" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <text class="actor-name" x="28" y="86">Koordinátor</text>
+        </g>
+
+        <!-- Admin (right of hierarchy) -->
+        <g transform="translate(115, 1060)">
+          <circle cx="28" cy="12" r="10" fill="none" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="22" x2="28" y2="48" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="10" y1="32" x2="46" y2="32" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="48" x2="12" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <line x1="28" y1="48" x2="44" y2="68" stroke="#0f172a" stroke-width="1.5"/>
+          <text class="actor-name" x="28" y="86">Admin</text>
+        </g>
+
+        <!-- Actor generalization arrows -->
+        <line class="inherit-line" x1="83" y1="206" x2="82" y2="250" marker-end="url(#arrow-inherit)"/>
+        <line class="inherit-line" x1="82" y1="336" x2="58" y2="390" marker-end="url(#arrow-inherit)"/>
+        <line class="inherit-line" x1="82" y1="336" x2="58" y2="530" marker-end="url(#arrow-inherit)"/>
+        <line class="inherit-line" x1="82" y1="336" x2="58" y2="930" marker-end="url(#arrow-inherit)"/>
+        <line class="inherit-line" x1="58" y1="596" x2="38" y2="660" marker-end="url(#arrow-inherit)"/>
+        <line class="inherit-line" x1="58" y1="596" x2="38" y2="790" marker-end="url(#arrow-inherit)"/>
+        <line class="inherit-line" x1="58" y1="996" x2="38" y2="1060" marker-end="url(#arrow-inherit)"/>
+        <line class="inherit-line" x1="58" y1="996" x2="143" y2="1060" marker-end="url(#arrow-inherit)"/>
+
+        <!-- ===================== EXTERNAL ACTORS RIGHT ===================== -->
+        <g transform="translate(1360, 180)">
+          <rect x="0" y="0" width="56" height="56" rx="6" fill="#ecfeff" stroke="#0891b2" stroke-width="1.5"/>
+          <text class="actor-name external" x="28" y="24">Emailový</text>
+          <text class="actor-name external" x="28" y="40">modul</text>
+        </g>
+
+        <g transform="translate(1360, 720)">
+          <rect x="0" y="0" width="56" height="56" rx="6" fill="#ecfeff" stroke="#0891b2" stroke-width="1.5"/>
+          <text class="actor-name external" x="28" y="32">Bakaláři</text>
+        </g>
+
+        <!-- ===================== SYSTEM BOUNDARY ===================== -->
+        <rect class="system-boundary" x="200" y="40" width="1120" height="1100" rx="14"/>
+        <text class="system-title" x="760" y="68" text-anchor="middle">Erasmus Systém</text>
+
+        <!-- ZONES -->
+        <rect class="zone" x="230" y="90" width="320" height="250" fill="#ecfdf5" stroke="#10b981"/>
+        <text class="zone-title" x="240" y="108">Veřejná část</text>
+
+        <rect class="zone" x="230" y="360" width="320" height="280" fill="#fef3c7" stroke="#f59e0b"/>
+        <text class="zone-title" x="240" y="378">Žákovská část</text>
+
+        <rect class="zone" x="230" y="660" width="320" height="200" fill="#fce7f3" stroke="#db2777"/>
+        <text class="zone-title" x="240" y="678">Zóna učitele</text>
+
+        <rect class="zone" x="580" y="90" width="380" height="300" fill="#ede9fe" stroke="#7c3aed"/>
+        <text class="zone-title" x="590" y="108">Zóna koordinátora</text>
+
+        <rect class="zone" x="580" y="410" width="380" height="200" fill="#fff7ed" stroke="#ea580c"/>
+        <text class="zone-title" x="590" y="428">Systémové procesy</text>
+
+        <rect class="zone" x="580" y="630" width="380" height="230" fill="#f1f5f9" stroke="#64748b"/>
+        <text class="zone-title" x="590" y="648">Autentizace</text>
+
+        <rect class="zone" x="990" y="90" width="300" height="300" fill="#ede9fe" stroke="#7c3aed" opacity="0.55"/>
+        <text class="zone-title" x="1000" y="108">Správa (Admin)</text>
+
+        <!-- ===================== USE CASES — helper macro via groups ===================== -->
+
+        <!-- PUBLIC -->
+        <g id="uc-public">
+          <ellipse class="use-case" cx="390" cy="130" rx="88" ry="22"/>
+          <text class="use-case-text" x="390" y="126">Prohlížet info o Erasmu</text>
+          <ellipse class="use-case" cx="390" cy="170" rx="88" ry="22"/>
+          <text class="use-case-text" x="390" y="166">Prohlížet nabídku stáží</text>
+          <ellipse class="use-case" cx="390" cy="210" rx="88" ry="22"/>
+          <text class="use-case-text" x="390" y="206">Stáhnout kriteria výběru</text>
+          <ellipse class="use-case" cx="390" cy="250" rx="100" ry="26"/>
+          <text class="use-case-text small" x="390" y="246">Prohlížet fotogalerii / detail stáže</text>
+          <ellipse class="use-case" cx="390" cy="295" rx="88" ry="22"/>
+          <text class="use-case-text" x="390" y="291">Zobrazit kontakt koordinátora</text>
+          <ellipse class="use-case" cx="390" cy="330" rx="72" ry="20"/>
+          <text class="use-case-text small" x="390" y="326">Zobrazit GDPR / přístupnost</text>
+        </g>
+
+        <!-- STUDENT -->
+        <g id="uc-student">
+          <ellipse class="use-case" cx="390" cy="400" rx="78" ry="22"/>
+          <text class="use-case-text" x="390" y="396">Registrace žáka</text>
+          <ellipse class="use-case" cx="390" cy="445" rx="78" ry="22"/>
+          <text class="use-case-text" x="390" y="441">Podat přihlášku</text>
+          <ellipse class="use-case" cx="390" cy="490" rx="88" ry="22"/>
+          <text class="use-case-text" x="390" y="486">Nahrát CV a motivační dopis</text>
+          <ellipse class="use-case" cx="390" cy="535" rx="78" ry="22"/>
+          <text class="use-case-text" x="390" y="531">Sledovat stav přihlášky</text>
+          <ellipse class="use-case" cx="390" cy="580" rx="72" ry="22"/>
+          <text class="use-case-text" x="390" y="576">Napsat test AJ</text>
+          <ellipse class="use-case" cx="390" cy="625" rx="95" ry="24"/>
+          <text class="use-case-text small" x="390" y="621">Odevzdat materiály ze stáže</text>
+        </g>
+
+        <!-- TEACHER -->
+        <g id="uc-teacher">
+          <ellipse class="use-case" cx="390" cy="700" rx="95" ry="24"/>
+          <text class="use-case-text small" x="390" y="696">Vyplnit doporučení TU (krok 1+2)</text>
+          <ellipse class="use-case" cx="390" cy="750" rx="95" ry="22"/>
+          <text class="use-case-text small" x="390" y="746">Ověřit prospěch z Bakalářů</text>
+          <ellipse class="use-case" cx="390" cy="795" rx="88" ry="22"/>
+          <text class="use-case-text" x="390" y="791">Vyplnit posudek TU</text>
+          <ellipse class="use-case" cx="390" cy="840" rx="100" ry="24"/>
+          <text class="use-case-text small" x="390" y="836">Hodnotit CV a motivační dopis</text>
+        </g>
+
+        <!-- COORDINATOR -->
+        <g id="uc-coord">
+          <ellipse class="use-case" cx="770" cy="130" rx="95" ry="24"/>
+          <text class="use-case-text small" x="770" y="126">Přehled všech přihlášek</text>
+          <ellipse class="use-case" cx="770" cy="175" rx="88" ry="22"/>
+          <text class="use-case-text" x="770" y="171">Měnit stav výběru</text>
+          <ellipse class="use-case" cx="770" cy="220" rx="88" ry="22"/>
+          <text class="use-case-text" x="770" y="216">Spravovat mobility</text>
+          <ellipse class="use-case" cx="770" cy="265" rx="100" ry="24"/>
+          <text class="use-case-text small" x="770" y="261">Spravovat obecný obsah webu</text>
+          <ellipse class="use-case" cx="770" cy="310" rx="95" ry="24"/>
+          <text class="use-case-text small" x="770" y="306">Spravovat otázky testu AJ</text>
+          <ellipse class="use-case" cx="770" cy="355" rx="100" ry="24"/>
+          <text class="use-case-text small" x="770" y="351">Schvalovat fotky na web</text>
+        </g>
+
+        <!-- SYSTEM PROCESSES -->
+        <g id="uc-system">
+          <ellipse class="use-case" cx="770" cy="455" rx="88" ry="22"/>
+          <text class="use-case-text" x="770" y="451">Automatické bodování</text>
+          <ellipse class="use-case" cx="770" cy="500" rx="95" ry="24"/>
+          <text class="use-case-text small" x="770" y="496">Automatické vyřazení</text>
+          <ellipse class="use-case" cx="770" cy="545" rx="88" ry="22"/>
+          <text class="use-case-text" x="770" y="541">Sestavit pořadí</text>
+          <ellipse class="use-case" cx="770" cy="590" rx="95" ry="24"/>
+          <text class="use-case-text small" x="770" y="586">Rozhodnutí komise (shoda)</text>
+        </g>
+
+        <!-- AUTH -->
+        <g id="uc-auth">
+          <ellipse class="use-case" cx="770" cy="680" rx="68" ry="22"/>
+          <text class="use-case-text" x="770" y="676">Přihlásit se</text>
+          <ellipse class="use-case" cx="770" cy="730" rx="68" ry="22"/>
+          <text class="use-case-text" x="770" y="726">Odhlásit se</text>
+          <ellipse class="use-case" cx="770" cy="800" rx="88" ry="22"/>
+          <text class="use-case-text" x="770" y="796">Odeslat notifikaci</text>
+        </g>
+
+        <!-- ADMIN -->
+        <g id="uc-admin">
+          <ellipse class="use-case" cx="1140" cy="140" rx="95" ry="24"/>
+          <text class="use-case-text small" x="1140" y="136">Tisknout dokumenty dle předloh</text>
+          <ellipse class="use-case" cx="1140" cy="195" rx="88" ry="22"/>
+          <text class="use-case-text" x="1140" y="191">Importovat učitele a data</text>
+          <ellipse class="use-case" cx="1140" cy="250" rx="78" ry="22"/>
+          <text class="use-case-text" x="1140" y="246">Spravovat uživatele</text>
+        </g>
+
+        <!-- EXTEND use cases (errors) -->
+        <ellipse class="use-case" cx="620" cy="730" rx="88" ry="22" fill="#fff5f5" stroke="#dc2626"/>
+        <text class="use-case-text small" x="620" y="726">Zobrazit chybu přihlášení</text>
+        <ellipse class="use-case" cx="500" cy="430" rx="88" ry="22" fill="#fff5f5" stroke="#dc2626"/>
+        <text class="use-case-text small" x="500" y="426">Zobrazit chybu registrace</text>
+        <ellipse class="use-case" cx="500" cy="475" rx="88" ry="22" fill="#fff5f5" stroke="#dc2626"/>
+        <text class="use-case-text small" x="500" y="471">Zobrazit chybu přihlášky</text>
+
+        <!-- ===================== INCLUDE / EXTEND ===================== -->
+        <path class="include-line" d="M390 467 L390 490"/>
+        <text class="stereotype" x="405" y="482">&lt;&lt;include&gt;&gt;</text>
+
+        <path class="include-line" d="M390 622 L770 455" />
+        <text class="stereotype" x="560" y="530">&lt;&lt;include&gt;&gt; po odevzdání</text>
+
+        <path class="include-line" d="M770 154 L770 443"/>
+        <text class="stereotype" x="785" y="300">&lt;&lt;include&gt;&gt;</text>
+
+        <path class="include-line" d="M770 187 L770 443"/>
+        <path class="include-line" d="M770 500 L770 545"/>
+
+        <path class="include-line" d="M390 712 L390 750"/>
+        <path class="include-line" d="M390 772 L390 795"/>
+
+        <path class="include-line" d="M390 400 L770 800"/>
+        <path class="include-line" d="M390 445 L770 800"/>
+        <path class="include-line" d="M390 625 L770 800"/>
+        <path class="include-line" d="M770 175 L770 800"/>
+
+        <path class="extend-line" d="M620 708 L700 688"/>
+        <text class="stereotype" x="625" y="700">&lt;&lt;extend&gt;&gt;</text>
+        <path class="extend-line" d="M500 430 L430 410"/>
+        <path class="extend-line" d="M500 475 L430 450"/>
+
+        <!-- External: Bakaláři -->
+        <path class="external-line" d="M390 750 L1360 748"/>
+        <text class="stereotype" x="820" y="742">čte export / ověření</text>
+
+        <!-- External: Email -->
+        <path class="external-line" d="M858 800 L1360 208"/>
+        <text class="stereotype" x="1080" y="490">notifikace</text>
+
+        <!-- ===================== ACTOR ASSOCIATIONS ===================== -->
+        <!-- Návštěvník → public -->
+        <line class="actor-line" x1="110" y1="170" x2="302" y2="130"/>
+        <line class="actor-line" x1="110" y1="175" x2="302" y2="170"/>
+        <line class="actor-line" x1="110" y1="180" x2="302" y2="210"/>
+        <line class="actor-line" x1="110" y1="185" x2="290" y2="250"/>
+        <line class="actor-line" x1="110" y1="190" x2="302" y2="295"/>
+        <line class="actor-line" x1="110" y1="195" x2="318" y2="330"/>
+
+        <!-- Žák -->
+        <line class="actor-line" x1="86" y1="450" x2="312" y2="400"/>
+        <line class="actor-line" x1="86" y1="455" x2="312" y2="445"/>
+        <line class="actor-line" x1="86" y1="460" x2="302" y2="490"/>
+        <line class="actor-line" x1="86" y1="465" x2="312" y2="535"/>
+        <line class="actor-line" x1="86" y1="470" x2="318" y2="580"/>
+        <line class="actor-line" x1="86" y1="475" x2="295" y2="625"/>
+
+        <!-- Třídní učitel -->
+        <line class="actor-line" x1="66" y1="720" x2="295" y2="700"/>
+        <line class="actor-line" x1="66" y1="730" x2="295" y2="795"/>
+
+        <!-- Učitel AJ -->
+        <line class="actor-line" x1="66" y1="850" x2="290" y2="840"/>
+
+        <!-- Koordinátor -->
+        <line class="actor-line" x1="66" y1="1090" x2="675" y2="130"/>
+        <line class="actor-line" x1="66" y1="1095" x2="682" y2="175"/>
+        <line class="actor-line" x1="66" y1="1100" x2="682" y2="220"/>
+        <line class="actor-line" x1="66" y1="1105" x2="670" y2="265"/>
+        <line class="actor-line" x1="66" y1="1110" x2="665" y2="310"/>
+        <line class="actor-line" x1="66" y1="1115" x2="670" y2="355"/>
+        <line class="actor-line" x1="82" y1="1120" x2="770" y2="680"/>
+        <line class="actor-line" x1="82" y1="1125" x2="770" y2="730"/>
+
+        <!-- Admin -->
+        <line class="actor-line" x1="171" y1="1120" x2="1045" y2="140"/>
+        <line class="actor-line" x1="171" y1="1125" x2="1052" y2="195"/>
+        <line class="actor-line" x1="171" y1="1130" x2="1062" y2="250"/>
+        <line class="actor-line" x1="171" y1="1135" x2="770" y2="680"/>
+        <line class="actor-line" x1="171" y1="1140" x2="770" y2="730"/>
+
+        <!-- Přihlášený uživatel inherits login - show note -->
+        <rect class="note-box" x="210" y="880" width="195" height="72"/>
+        <text class="note-text" x="220" y="898">Dědičnost: Přihlásit se / Odhlásit se</text>
+        <text class="note-text" x="220" y="912">sdílí Žák, Učitel, Správce</text>
+        <text class="note-text" x="220" y="926">(bez opakování čar u každého)</text>
+        <text class="note-text" x="220" y="940">Návštěvník = bez přihlášení</text>
+
+        <rect class="note-box" x="990" y="410" width="290" height="58"/>
+        <text class="note-text" x="1000" y="428">Koordinátor + Admin dědí ze Správce;</text>
+        <text class="note-text" x="1000" y="442">Admin navíc správu uživatelů a import.</text>
+        <text class="note-text" x="1000" y="456">Superadmin mimo MVP — vynechán.</text>
+
+      </svg>
+    </div>
+  </main>
+
+  <footer>
+    Soubor: <code>materiály/diagramy/use-case-diagram.html</code> — otevři v prohlížeči. Pro dokumentaci můžeš exportovat screenshot nebo vytisknout (Ctrl/Cmd+P).
+  </footer>
+
+  <script>
+    let scale = 1;
+    const canvas = document.getElementById("canvas");
+    const viewport = document.getElementById("viewport");
+
+    function applyScale() {
+      canvas.style.transform = `scale(${scale})`;
+      viewport.style.height = `${Math.min(window.innerHeight - 170, 1180 * scale + 32)}px`;
+    }
+
+    document.getElementById("zoom-in").addEventListener("click", () => {
+      scale = Math.min(1.6, scale + 0.1);
+      applyScale();
+    });
+    document.getElementById("zoom-out").addEventListener("click", () => {
+      scale = Math.max(0.5, scale - 0.1);
+      applyScale();
+    });
+    document.getElementById("zoom-reset").addEventListener("click", () => {
+      scale = 1;
+      applyScale();
+    });
+
+    applyScale();
+  </script>
+</body>
+</html>
