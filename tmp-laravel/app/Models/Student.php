@@ -11,7 +11,7 @@ class Student extends Model
     }
 
     public function schoolClass() {
-        return $this->belongsTo(SchoolClass::class, 'class_id');
+        return $this->belongsTo(Classes::class, 'class_id');
     }
 
     public function applications() {
