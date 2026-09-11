@@ -17,6 +17,15 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    public function student() {
+        return $this->hasOne(Student::class);
+    }
+
+    public function teacher() {
+        return $this->hasOne(Teacher::class);
+    }
+
+
     /**
      * Get the attributes that should be cast.
      *
