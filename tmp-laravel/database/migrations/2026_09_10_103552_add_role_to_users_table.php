@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('users', function (Blueprint $table) {
             $table->string('role')->defualt('zak'); //sloupec role s defualtem zak -> ucitel, koordinator, admin, superadmin
-            $table->boolean('role')->default(true); //sloupec jestli je user aktivni
+            $table->boolean('is_active')->default(true); //sloupec jestli je user aktivni
             });
     }
 
