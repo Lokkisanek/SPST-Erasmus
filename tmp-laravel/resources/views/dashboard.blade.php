@@ -11,6 +11,7 @@
                 <div class="p-6 text-gray-900">
                     @if (auth()->user()->role === 'zak')
                     <p>žák</p>
+                    <a href="{{ route('applications.create') }}">Podat přihlášku</a>
                     @elseif (auth()->user()->role === 'ucitel')
                     <p>učitel</p>
                     @else
