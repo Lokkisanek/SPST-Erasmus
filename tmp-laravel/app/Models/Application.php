@@ -3,6 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+
+#[Fillable([
+    'student_id',
+    'mobility_id',
+    'class_teacher_id',
+    'english_teacher_id',
+    'preferred_type',
+    'status',
+    'gdpr_consent',
+    'submitted_at',
+])]
 
 class Application extends Model
 {
