@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('classes', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->unsignedTinyIneteger('year');
+            $table->unsignedTinyInteger('year');
             $table->string('program_type');
             $table->string('field');
             $table->timestamps();
