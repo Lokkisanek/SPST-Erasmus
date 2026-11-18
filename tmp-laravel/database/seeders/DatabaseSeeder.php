@@ -79,7 +79,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $mobility = Mobility::create([
-            'class_id' => $class->id, // máš to v migraci; později by mobilita neměla viset na jedné třídě
+            'class_id' => $class->id, 
             'destination' => 'Finsko',
             'type' => 'dvoutydenni',
             'season' => 'jaro',
