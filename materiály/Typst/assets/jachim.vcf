@@ -1,0 +1,14 @@
+BEGIN:VCARD
+VERSION:3.0
+CLASS:PUBLIC
+REV:2026-11-18 14:31:22
+FN:Jáchim Václav, Ing.
+N:Jáchim;Václav;;Ing.;
+ORG:Kraj Vysočina;odbor informatiky
+ADR;TYPE=work:;;Jihlava;;;58601;Česká Republika
+EMAIL;TYPE=internet,pref:jachim.v@kr-vysocina.cz
+TEL;TYPE=work,voice:+420564602346
+TEL;TYPE=cell,voice:+420724650203
+URL;TYPE=work:https://www.kr-vysocina.cz
+TZ:+01:00
+END:VCARD
